@@ -1,17 +1,18 @@
 from django.shortcuts import render
 
 
-def about(request):
+def error_404(request, exception):
+    return render(request, "pages/404.html", status=404)
 
-    context = {
-        "title": "О проекте",
-    }
-    return render(request, "pages/about.html", context)
+def error_403(request, reason=""):
+    return render(request, "pages/403_csrf.html", status=403)
+
+def error_500(request):
+    return render(request, "pages/500.html", status=500)
+
+def about(request):
+    return render(request, "pages/about.html")
 
 
 def rules(request):
-
-    context = {
-        "title": "Наши правила",
-    }
-    return render(request, "pages/rules.html", context)
+    return render(request, "pages/rules.html")
