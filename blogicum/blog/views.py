@@ -19,13 +19,12 @@ PAGINATION = 10
 # Базовые
 class IndexView(ListView):
     """Главная страница со лентой всех доступных публикаций"""
-    
+
     template_name = "blog/index.html"
     paginate_by = PAGINATION
 
     def get_queryset(self):
         return get_available_posts()
-    
 
 
 class CategoryView(ListView):
@@ -36,12 +35,15 @@ class CategoryView(ListView):
 
     def get_queryset(self):
         return (
-            get_available_posts().filter(category__slug=self.kwargs["category_slug"])
+            get_available_posts()
+            .filter(category__slug=self.kwargs["category_slug"])
         )
-        
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category = get_object_or_404(Category, is_published=True, slug=self.kwargs["category_slug"])
+        category = get_object_or_404(
+            Category, is_published=True, slug=self.kwargs["category_slug"]
+        )
         context["category"] = category
         return context
 
