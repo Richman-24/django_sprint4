@@ -8,9 +8,7 @@ from django.urls import reverse_lazy
 
 from .forms import CommentForm, PostForm
 from blog.models import Category, Comment, Post, User
-from blog.utils import (
-    CommentMixin, PostValidMixin, OnlyAuthorMixin, get_available_posts
-)
+from blog.utils import PostValidMixin, OnlyAuthorMixin, get_available_posts
 
 
 PAGINATION = 10
@@ -41,10 +39,9 @@ class CategoryView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category = get_object_or_404(
+        context["category"] = get_object_or_404(
             Category, is_published=True, slug=self.kwargs["category_slug"]
         )
-        context["category"] = category
         return context
 
 
@@ -83,11 +80,10 @@ class PostEditMixin:
     pk_url_kwarg = "post_id"
 
 
-class PostCreateView(LoginRequiredMixin, PostValidMixin, CreateView):
+class PostCreateView(
+    LoginRequiredMixin, PostEditMixin, PostValidMixin, CreateView
+):
     """Страница создания новой публикации"""
-
-    form_class = PostForm
-    template_name = "blog/create.html"
 
     def get_success_url(self):
         return reverse_lazy(
@@ -124,13 +120,20 @@ class PostDeleteView(
 
 
 # Комментарии
-class CommentCreateView(LoginRequiredMixin, CommentMixin, CreateView):
-    """Контроллер создания нового комментария"""
-
+class CommentEditMixin:
     model = Comment
     form_class = CommentForm
-    template_name = 'blog/create.html'
-    pk_url_kwarg = "post_id"
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "blog:post_detail", kwargs={"post_id": self.kwargs["post_id"]}
+        )
+
+
+class CommentCreateView(
+    LoginRequiredMixin, CommentEditMixin, PostEditMixin, CreateView
+):
+    """Контроллер создания нового комментария"""
 
     def dispatch(self, request, *args, **kwargs):
         self.post_obj = get_object_or_404(
@@ -147,22 +150,19 @@ class CommentCreateView(LoginRequiredMixin, CommentMixin, CreateView):
 
 
 class CommentUpdateView(
-    LoginRequiredMixin, OnlyAuthorMixin, CommentMixin, UpdateView
+    LoginRequiredMixin, OnlyAuthorMixin, CommentEditMixin, UpdateView
 ):
     """Контроллер изменения нового комментария"""
 
-    model = Comment
-    form_class = CommentForm
     template_name = "blog/comment.html"
     pk_url_kwarg = "comment_id"
 
 
 class CommentDeleteView(
-    LoginRequiredMixin, OnlyAuthorMixin, CommentMixin, DeleteView
+    LoginRequiredMixin, OnlyAuthorMixin, CommentEditMixin, DeleteView
 ):
     """Контроллер удаления нового комментария"""
 
-    model = Comment
     pk_url_kwarg = "comment_id"
     template_name = "blog/comment.html"
 
@@ -181,8 +181,7 @@ class Profile(ListView):
         )
         return get_available_posts(
             filter_published=self.request.user != self.author,
-            selected_related=False,
-            comment_count=True).filter(author=self.author.id)
+            selected_related=False).filter(author=self.author.id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

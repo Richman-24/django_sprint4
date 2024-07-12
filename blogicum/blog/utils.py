@@ -1,7 +1,6 @@
 ﻿from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Count
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
 from django.utils import timezone
 
 from blog.models import Post
@@ -49,10 +48,3 @@ class OnlyAuthorMixin(UserPassesTestMixin):
 
     def handle_no_permission(self):
         return redirect("blog:post_detail", post_id=self.get_object().pk)
-
-
-class CommentMixin:
-    def get_success_url(self):
-        return reverse_lazy(
-            "blog:post_detail", kwargs={"post_id": self.kwargs["post_id"]}
-        )
