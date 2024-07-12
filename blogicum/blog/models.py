@@ -6,7 +6,7 @@ from django.utils import timezone
 User = get_user_model()
 
 
-class PostModel(models.Model):  # Базовая модель поста, чтобы было по DRY
+class PostModel(models.Model):
 
     is_published = models.BooleanField(
         default=True,

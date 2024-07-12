@@ -1,4 +1,4 @@
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView,
 )
@@ -19,35 +19,29 @@ PAGINATION = 10
 # Базовые
 class IndexView(ListView):
     """Главная страница со лентой всех доступных публикаций"""
-
+    
     template_name = "blog/index.html"
-    model = Post
     paginate_by = PAGINATION
 
     def get_queryset(self):
         return get_available_posts()
+    
 
 
 class CategoryView(ListView):
     """Страница со лентой всех доступных публикаций по категории"""
 
-    model = Post
     template_name = "blog/category.html"
     paginate_by = PAGINATION
-    allow_empty = False
 
     def get_queryset(self):
-        return get_list_or_404(
-            get_available_posts()
-            .filter(category__slug=self.kwargs["category_slug"])
+        return (
+            get_available_posts().filter(category__slug=self.kwargs["category_slug"])
         )
-
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category = get_object_or_404(
-            Category,
-            is_published=True,
-            slug=self.kwargs['category_slug'])
+        category = get_object_or_404(Category, is_published=True, slug=self.kwargs["category_slug"])
         context["category"] = category
         return context
 
