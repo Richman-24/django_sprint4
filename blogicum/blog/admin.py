@@ -1,6 +1,7 @@
-﻿from django.contrib import admin
+﻿from bs4 import Comment
+from django.contrib import admin
 
-from blog.models import Category, Location, Post
+from blog.models import Category, Location, Post, Comment
 
 
 @admin.register(Category)
@@ -19,3 +20,12 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ["name"]
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ["post", "author", "created_at", "short_text"]
+
+    def short_text(self, obj):
+        return obj.text[:30] + "..." if len(obj.text) > 30 else obj.text
+    short_text.short_description = "Text"

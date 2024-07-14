@@ -93,7 +93,7 @@ class Post(PostModel):
         verbose_name = "публикация"
         verbose_name_plural = "Публикации"
         default_related_name = "posts"
-        ordering = ['-pub_date', 'title']
+        ordering = ["-pub_date", "title"]
 
     def __str__(self):
         return self.title
@@ -125,6 +125,8 @@ class Comment(models.Model):
 
     class Meta:
         db_table = "comment"
+        verbose_name = "комментарий"
+        verbose_name_plural = "Комментарии"
         ordering = ("created_at",)
         default_related_name = "comments"
 

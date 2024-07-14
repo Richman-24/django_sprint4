@@ -19,7 +19,7 @@ def get_available_posts(
             "author",
             "category",
         )
-    if comment_count:  # А как с комментами сработает?
+    if comment_count:  # В текущем виде-никак, но это на будущее уже вопрос))
         posts = posts.annotate(comment_count=Count("comments")).order_by(
             *posts.model._meta.ordering
         )

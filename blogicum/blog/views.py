@@ -66,7 +66,7 @@ class PostDetailView(FormMixin, DetailView):
         return super().get_context_data(
             **kwargs,
             form=CommentForm(),
-            comments=self.object.comments.select_related('author')
+            comments=self.object.comments.select_related("author")
         )
 
 
@@ -115,7 +115,7 @@ class PostDeleteView(
 
     def get_success_url(self):
         return reverse_lazy(
-            'blog:profile', args=[self.request.user.username]
+            "blog:profile", args=[self.request.user.username]
         )
 
 
@@ -171,13 +171,13 @@ class CommentDeleteView(
 class Profile(ListView):
     """Страница - личный кабинет пользователя со списком ВСЕХ его статей"""
 
-    template_name = 'blog/profile.html'
+    template_name = "blog/profile.html"
     paginate_by = PAGINATION
 
     def get_queryset(self):
         self.author = get_object_or_404(
             User,
-            username=self.kwargs['username']
+            username=self.kwargs["username"]
         )
         return get_available_posts(
             filter_published=self.request.user != self.author,
@@ -185,7 +185,7 @@ class Profile(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['profile'] = self.author
+        context["profile"] = self.author
         return context
 
 
@@ -193,12 +193,12 @@ class EditProfile(LoginRequiredMixin, UpdateView):
     """Страница изменения профиля пользователя"""
 
     model = User
-    template_name = 'blog/user.html'
+    template_name = "blog/user.html"
     fields = (
-        'username',
-        'first_name',
-        'last_name',
-        'email',
+        "username",
+        "first_name",
+        "last_name",
+        "email",
     )
 
     def get_object(self):

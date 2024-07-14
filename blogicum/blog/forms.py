@@ -1,17 +1,24 @@
 ﻿from django import forms
 from django.core.mail import send_mail
+from django.utils import timezone
 
 from blog.models import Post, Comment
 
 
 class PostForm(forms.ModelForm):
-    pub_date = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
-    )
+
+    def __init__(self, *args, **kwargs):  # Предзаполнение поля pub_date
+        super().__init__(*args, **kwargs)
+        self.fields['pub_date'].initial = timezone.localtime(
+            timezone.now()
+        ).strftime("%Y-%m-%dT%H:%M")
 
     class Meta:
         model = Post
         exclude = ("author",)
+        widgets = {
+            "pub_date": forms.DateTimeInput(attrs={"type": "datetime-local"})
+        }
 
     def clean(self):
         super().clean()
